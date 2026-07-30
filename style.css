@@ -1,0 +1,115 @@
+/**
+ * @file style.css
+ * ========================================================================
+ * ESTILOS GLOBAIS E REFINAMENTOS FINOS
+ * ========================================================================
+ * Este arquivo atua como um complemento ao Tailwind CSS (que roda via CDN 
+ * no index.html). Ele é usado exclusivamente para regras que são difíceis 
+ * ou verbosas demais para se fazer usando apenas as classes utilitárias do 
+ * Tailwind (como customização de Scrollbars e declaração de variáveis globais).
+ */
+
+/* ========================================================================
+  [1] IMPORTAÇÃO DE FONTES (Google Fonts)
+  Trazemos 3 famílias tipográficas com pesos específicos (wght):
+  - Inter: Para textos corridos (sans-serif)
+  - Space Grotesk: Para títulos de impacto (display)
+  - JetBrains Mono: Para tags, códigos e labels pequenas (monospace)
+  ========================================================================
+*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ========================================================================
+  [2] VARIÁVEIS CSS GLOBAIS (:root)
+  Definimos as fontes importadas acima como variáveis nativas do CSS.
+  O "system-ui" e "-apple-system" servem como "fallback" (plano B) caso o 
+  Google Fonts falhe em carregar, usando a fonte padrão do sistema do usuário.
+  ========================================================================
+*/
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* ========================================================================
+  [3] ESTILOS BASE DO CORPO (BODY)
+  Aplica as cores de fundo (Eggshell) e texto padrão da nossa identidade.
+  O font-smoothing melhora a renderização (suavidade) da fonte nos 
+  navegadores baseados em WebKit (Chrome, Safari) e MacOS.
+  ========================================================================
+*/
+body {
+  font-family: var(--font-sans);
+  background-color: #f7f6f3; /* Fundo Eggshell (Creme suave/Stone 50) */
+  color: #1c1917; /* Texto escuro puro (Stone 900) para alto contraste */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========================================================================
+  [4] CLASSES UTILITÁRIAS DE FONTE
+  Criamos essas classes para facilitar o uso das variáveis no HTML, ligando 
+  com a configuração 'fontFamily' que fizemos no script do Tailwind no index.
+  ========================================================================
+*/
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* ========================================================================
+  [5] CUSTOMIZAÇÃO DA BARRA DE ROLAGEM (SCROLLBAR) - ESTÉTICA GERAL
+  Navegadores têm scrollbars nativas feias. Aqui nós redesenhamos elas para
+  que fiquem arredondadas e combinem com o design moderno da plataforma.
+  ========================================================================
+*/
+/* Define a largura (vertical) e altura (horizontal) da barra */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* O "Trilho" onde a barra corre. Fica transparente para visual limpo */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* A "Pegadeira" (Thumb) da barra de rolagem */
+::-webkit-scrollbar-thumb {
+  background: #e7e5e4; /* Cor cinza clara (Stone 200) */
+  border-radius: 9999px; /* Deixa totalmente arredondada (formato pílula) */
+  border: 2px solid #f7f6f3; /* Cria um espaço (borda) com a mesma cor do fundo para dar respiro */
+}
+
+/* Quando o usuário passa o mouse por cima da barra de rolagem */
+::-webkit-scrollbar-thumb:hover {
+  background: #d6d3d1; /* Escurece levemente (Stone 300) para indicar interação */
+}
+
+/* ========================================================================
+  [6] BARRA DE ROLAGEM INVISÍVEL (NO-SCROLLBAR)
+  Útil para áreas como a lista de Filtros (Categorias), onde queremos que o
+  usuário possa arrastar pelo celular, mas sem mostrar a barra física na tela.
+  ========================================================================
+*/
+.scrollbar-none::-webkit-scrollbar {
+  display: none; /* Esconde no Chrome/Safari/Edge */
+}
+.scrollbar-none {
+  -ms-overflow-style: none;  /* Esconde no Internet Explorer e Edge antigo */
+  scrollbar-width: none;  /* Esconde no Firefox */
+}
+
+/* ========================================================================
+  [7] EFEITOS DE TRANSIÇÃO (HOVER) EM CARDS
+  Adiciona uma física mais suave quando interagimos com os cartões das lojas.
+  O cubic-bezier cria uma aceleração matemática suave ao invés de linear.
+  ========================================================================
+*/
+.business-card {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
