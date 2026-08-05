@@ -3,18 +3,19 @@
  * ========================================================================
  * BANCO DE DADOS ESTÁTICO (MOCK) E CONFIGURAÇÕES GLOBAIS
  * ========================================================================
- * Como nossa aplicação não possui um Back-End ou Banco de Dados em nuvem,
- * este arquivo atua como a nossa fonte de verdade inicial. Ele fornece 
- * as informações acadêmicas da UNINTER, as categorias do sistema e a 
- * carga inicial de 8 comércios locais.
+ * Como a nossa arquitetura é 100% Client-Side (Front-End) e não possui um 
+ * Back-End ou servidor tradicional, este ficheiro atua como a "Fonte de Verdade" inicial.
+ * Ele fornece os dados institucionais, as regras de categoria e a carga inicial 
+ * (seed) de comércios que alimentarão o localStorage do navegador da aplicação.
  */
 
 /* ========================================================================
-  [1] INFORMAÇÕES ACADÊMICAS (UNINTER)
-  Objeto constante lido pelo script.js para preencher a barra lateral 
-  (Painel do Estudante) automaticamente.
-  ========================================================================
-*/
+   1. INFORMAÇÕES ACADÉMICAS (UNINTER)
+   ------------------------------------------------------------------------
+   Objeto lido pelo ficheiro script.js para preencher dinamicamente a barra lateral 
+   (Painel do Estudante). Separar estes dados da lógica da interface (UI) facilita 
+   futuras atualizações do projeto sem que seja necessário alterar o código HTML.
+   ======================================================================== */
 const PROPOSTA_ACADEMICA = {
   aluno: "Leonardo Mathucewski Pupia",
   ru: "4568395",
@@ -22,8 +23,7 @@ const PROPOSTA_ACADEMICA = {
   setorAplicacao: "Pequenos comércios varejistas, microempreendedores individuais e prestadores de serviços locais situados no bairro Lamenha Pequena, no município de Curitiba - PR.",
   ods: "ODS 08 - Trabalho Decente e Crescimento Econômico",
   odsJustificativa: "O catálogo web expande a presença digital de empreendedores locais de pequeno porte, fomentando a geração de renda e fortalecendo o comércio de bairro de maneira sustentável.",
-  
-  // Lista de objetivos. O script.js vai iterar sobre ela para gerar os <li> no HTML
+  // Array de objetivos que será percorrido (loop) para gerar a lista no DOM dinamicamente
   objetivos: [
     "Desenvolver um catálogo web interativo e responsivo utilizando HTML, CSS e JavaScript para mapear e divulgar pequenos comércios do bairro Lamenha Pequena em Curitiba - PR.",
     "Implementar interface amigável e acessível com HTML, CSS e JavaScript para facilitar a localização de serviços e o contato direto entre consumidores e comerciantes locais.",
@@ -32,14 +32,15 @@ const PROPOSTA_ACADEMICA = {
 };
 
 /* ========================================================================
-  [2] CATEGORIAS DO SISTEMA
-  Array simples usado para renderizar os botões de filtro no topo da 
-  página e as tags <option> dentro do formulário de cadastro (Modal).
-  A opção "Todos" é exclusiva para o filtro geral e ignorada no cadastro.
-  ========================================================================
-*/
+   2. SISTEMA DE CATEGORIAS
+   ------------------------------------------------------------------------
+   Array de strings que define a taxonomia (classificação) do catálogo web.
+   IMPORTANTE: O índice [0] ("Todos") atua como um reset global para os filtros.
+   O script.js itera sobre esta lista para renderizar os botões de filtro no topo
+   da página e preencher as opções (<option>) do <select> no modal de cadastro.
+   ======================================================================== */
 const CATEGORIAS = [
-  "Todos",
+  "Todos", // Não remover. Estruturalmente vital para limpar os filtros categóricos.
   "Alimentação & Gastronomia",
   "Saúde, Beleza & Bem-estar",
   "Comércio & Varejo",
@@ -52,11 +53,12 @@ const CATEGORIAS = [
 ];
 
 /* ========================================================================
-  [3] MAPEAMENTO DE ÍCONES (Assets Locais)
-  Dicionário (Objeto) que liga exatamente o nome da categoria com o 
-  caminho físico do arquivo de imagem salvo na pasta "imagens/".
-  ========================================================================
-*/
+   3. MAPEAMENTO DE ATIVOS (ASSETS) E LÓGICA DE FALLBACK
+   ------------------------------------------------------------------------
+   Dicionário (Hash Map) que relaciona cada categoria a um ficheiro de imagem
+   específico. Garante que qualquer comércio cadastrado (antigo ou novo) tenha 
+   sempre uma identidade visual associada à sua área de atuação, evitando erros 404.
+   ======================================================================== */
 const MAPA_IMAGENS_CATEGORIA = {
   "Alimentação & Gastronomia": "imagens/alimentacao.png",
   "Saúde, Beleza & Bem-estar": "imagens/saude.png",
@@ -70,47 +72,37 @@ const MAPA_IMAGENS_CATEGORIA = {
 };
 
 /**
- * Função Auxiliar Global: Puxa o caminho da imagem de acordo com a categoria.
- * Caso a categoria não exista no mapa, aciona um "fallback" (plano B)
- * retornando a imagem padrão "outros.png".
+ * Função utilitária global para obter a imagem correspondente a uma categoria.
+ * @param {string} categoria - O nome exato da categoria selecionada.
+ * @returns {string} O caminho relativo da imagem (.png) ou a imagem de fallback ("outros.png").
  */
 function obterImagemPorCategoria(categoria) {
+  // Utiliza o operador de curto-circuito (||) para garantir uma imagem genérica 
+  // caso a categoria solicitada não seja encontrada no mapa acima.
   return MAPA_IMAGENS_CATEGORIA[categoria] || "imagens/outros.png";
 }
 
 /* ========================================================================
-  [4] BASE DE DADOS INICIAL (Array de Objetos)
-  Lista oficial com 8 comércios locais. Quando o site abre pela 1ª vez, 
-  o script.js copia esta lista e a guarda no LocalStorage do navegador.
-  Cada chave deste objeto alimenta diretamente o visual do Card.
-  ========================================================================
-*/
+   4. CARGA DE DADOS INICIAL (SEED) DA APLICAÇÃO
+   ------------------------------------------------------------------------
+   Lista base (Array de Objetos) com os comércios de Lamenha Pequena. 
+   Na primeira execução da aplicação, o script.js vai ler esta matriz e 
+   guardá-la no 'localStorage'. As edições, favoritos e novos cadastros 
+   feitos via interface (UI) irão atualizar o localStorage e não este ficheiro.
+   ======================================================================== */
 const comercios = [
   {
-    id: "1", // Identificador único (Primary Key)
+    id: "1", // Identificador único (UUID simplificado) vital para encontrar itens ao favoritar ou excluir
     nome: "Osvaldo Pupia - Elétrica e Hidráulica",
-    categoria: "Casa & Construção",
+    categoria: "Casa & Construção", // Deve ser uma correspondência exata de uma string do array CATEGORIAS
     descricao: "Serviços profissionais e de confiança em manutenção elétrica e hidráulica, residencial e comercial.",
     localizacao: "Rua Justo Manfron, Santa Felicidade",
-    contato: "(41) 99621-3405", // O script vai limpar a formatação na hora de criar o link do Whatsapp
-    imagem: "imagens/casa & construção.png",
+    contato: "(41) 99621-3405", // O JavaScript processará esta string, removendo espaços e parênteses para a API do WhatsApp
+    imagem: "imagens/casa.png",
     horario: "Segunda a Sexta: 08:00 às 18:00",
-    tags: ["eletricista", "encanador", "reformas", "manutenção"], // Palavras ocultas para o buscador
-    rating: 5.0, // Avaliação simulada de 5 estrelas
-    destaque: true // Ativa a tag dourada "DESTAQUE" no topo do Card
-  },
-  {
-    id: "2",
-    nome: "Guindastes Ribas",
-    categoria: "Serviços Profissionais",
-    descricao: "Especialistas em locação de guindastes, guinchos e empilhadeiras. Tradição e segurança para o seu serviço.",
-    localizacao: "Rua Justo Manfron, Santa Felicidade",
-    contato: "(41) 99971-0136",
-    imagem: "imagens/serviços profissionais.png",
-    horario: "Segunda a Sábado: 07:30 às 18:30",
-    tags: ["guindaste", "locação", "guincho", "carga"],
-    rating: 4.8,
-    destaque: false
+    tags: ["eletricista", "encanador", "reformas", "manutenção"], // Palavras-chave fundamentais para alimentar o motor de busca
+    rating: 5.0, // Avaliação base do comércio
+    destaque: true // Propriedade booleana que controla a renderização de badges especiais na interface (Cartão Destaque)
   },
   {
     id: "3",
@@ -119,7 +111,7 @@ const comercios = [
     descricao: "Moda circular com peças únicas, sustentáveis e de alta qualidade com ótimos preços.",
     localizacao: "Rua Justo Manfron, 2422",
     contato: "(41) 98450-0260",
-    imagem: "imagens/comércio & varejo.png",
+    imagem: "imagens/comercio.png",
     horario: "Segunda a Sábado: 09:00 às 18:00",
     tags: ["roupas", "sustentável", "brechó", "moda"],
     rating: 4.9,
@@ -132,7 +124,7 @@ const comercios = [
     descricao: "Produtos de beleza, estética e perfumaria para cuidar do seu bem-estar diário.",
     localizacao: "Rua Justo Manfron, 2415",
     contato: "(43) 99953-8081",
-    imagem: "imagens/saúde, beleza & bem-estar.png",
+    imagem: "imagens/saude.png",
     horario: "Segunda a Sábado: 09:00 às 19:00",
     tags: ["maquiagem", "perfume", "cosméticos", "beleza"],
     rating: 4.7,
@@ -140,54 +132,54 @@ const comercios = [
   },
   {
     id: "5",
-    nome: "Bar do Vermelho",
-    categoria: "Alimentação & Gastronomia",
-    descricao: "Ponto de encontro tradicional do bairro com bebidas geladas, petiscos e itens de conveniência.",
-    localizacao: "Rua Justo Manfron, 2348",
-    contato: "(41) 3657-2291",
-    imagem: "imagens/alimentação & gastronomia.png",
-    horario: "Segunda a Domingo: 10:00 às 22:00",
-    tags: ["bebidas", "petiscos", "conveniência", "bar"],
-    rating: 4.9,
+    nome: "Floricultura Botanic Garden",
+    categoria: "Comércio & Varejo",
+    descricao: "Lindos arranjos florais, plantas ornamentais e artigos para jardinagem. A opção perfeita para presentear ou decorar o seu ambiente com a beleza da natureza.",
+    localizacao: "Rua Justo Manfron, 1779",
+    contato: "(41) 99877-8491",
+    imagem: "imagens/comercio.png",
+    horario: "Segunda a Sábado: 09:00 às 17:00",
+    tags: ["floricultura", "flores", "jardim", "plantas", "presentes", "botanic"],
+    rating: 5.0,
     destaque: false
   },
   {
     id: "6",
-    nome: "Toldos Santa Felicidade",
-    categoria: "Casa & Construção",
-    descricao: "Fabricação e instalação sob medida de toldos e coberturas, protegendo seu ambiente com qualidade.",
-    localizacao: "Rua Justo Manfron, 2206",
-    contato: "(41) 99991-6825",
-    imagem: "imagens/casa & construção.png",
-    horario: "Segunda a Sexta: 08:00 às 18:00 | Sábado: 08:00 às 12:00",
-    tags: ["toldos", "coberturas", "proteção", "lona"],
+    nome: "Chacrinha",
+    categoria: "Alimentação & Gastronomia",
+    descricao: "Um ambiente agradável e descontraído para curtir com a família e amigos. Servimos lanches deliciosos, porções caprichadas e bebidas sempre geladas.",
+    localizacao: "Rua Justo Manfron, 1874",
+    contato: "(41) 98444-8484",
+    imagem: "imagens/alimentacao.png",
+    horario: "Quarta a Domingo: 12:00 às 21:00",
+    tags: ["bar", "lanchonete", "lanches", "porções", "bebidas", "chacrinha"],
     rating: 5.0,
-    destaque: true
+    destaque: false
   },
   {
     id: "7",
-    nome: "Madeireira Manfron",
-    categoria: "Casa & Construção",
-    descricao: "Madeiras de procedência, ferragens e materiais essenciais para a sua construção ou reforma.",
-    localizacao: "Rua Justo Manfron, 2176",
-    contato: "(41) 98873-4866",
-    imagem: "imagens/casa & construção.png",
-    horario: "Segunda a Sexta: 07:30 às 18:00 | Sábado: 07:30 às 12:00",
-    tags: ["madeira", "construção", "ferragens", "reforma"],
-    rating: 4.8,
+    nome: "Aviário Bom Pra Cachorro",
+    categoria: "Comércio & Varejo",
+    descricao: "Tudo o que o seu pet precisa em um só lugar! Oferecemos uma grande variedade de rações, petiscos, acessórios e produtos de higiene para o bem-estar do seu animal de estimação.",
+    localizacao: "Rua Justo Manfron, 2336",
+    contato: "(41) 4101-0532",
+    imagem: "imagens/comercio.png",
+    horario: "Segunda a Sábado: 07:00 às 20:00",
+    tags: ["aviário", "pet shop", "ração", "cachorro", "gato", "animais", "pet"],
+    rating: 5.0,
     destaque: false
   },
   {
     id: "8",
-    nome: "Bueno Consultora",
-    categoria: "Serviços Profissionais",
-    descricao: "Consultoria especializada e atendimento personalizado para impulsionar o seu desenvolvimento.",
-    localizacao: "Av. Dr. Eugênio Bertolli, 3901",
-    contato: "(41) 3224-1713",
-    imagem: "imagens/serviços profissionais.png",
-    horario: "Segunda a Sexta: 09:00 às 18:00",
-    tags: ["consultoria", "planejamento", "gestão", "atendimento"],
-    rating: 4.9,
+    nome: "Big Brother Lanches",
+    categoria: "Alimentação & Gastronomia",
+    descricao: "O lugar ideal para matar a sua fome e curtir com os amigos! Oferecemos lanches saborosos, porções bem servidas e bebidas geladas com um atendimento de primeira.",
+    localizacao: "Rua Justo Manfron, 4142",
+    contato: "(41) 99779-8261",
+    imagem: "imagens/alimentacao.png",
+    horario: "Todos os dias: 09:00 às 21:00",
+    tags: ["lanchonete", "bar", "lanches", "porções", "hambúrguer", "bebidas"],
+    rating: 5.0,
     destaque: false
   }
 ];
