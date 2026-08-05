@@ -17,8 +17,8 @@
    futuras atualizações do projeto sem que seja necessário alterar o código HTML.
    ======================================================================== */
 const PROPOSTA_ACADEMICA = {
-  aluno: "Leonardo Mathucewski Pupia RU: 4568395",
-  ru: "4568395",
+  aluno: "Leonardo Mathucewski Pupia RU: 4658395",
+  ru: "4658395",
   titulo: "Desenvolvimento de Catálogo Web Comunitário para Divulgação de Pequenos Comércios no Bairro Lamenha Pequena em Curitiba - PR",
   setorAplicacao: "Pequenos comércios varejistas, microempreendedores individuais e prestadores de serviços locais situados no bairro Lamenha Pequena, no município de Curitiba - PR.",
   ods: "ODS 08 - Trabalho Decente e Crescimento Econômico",
